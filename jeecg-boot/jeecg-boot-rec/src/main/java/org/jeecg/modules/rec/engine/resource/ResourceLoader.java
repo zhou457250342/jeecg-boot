@@ -1,6 +1,6 @@
-package org.jeecg.rec.engine.resource;
+package org.jeecg.modules.rec.engine.resource;
 
-import org.jeecg.rec.engine.model.TradeData;
+import org.jeecg.modules.rec.engine.model.TradeData;
 
 import java.util.Date;
 import java.util.List;

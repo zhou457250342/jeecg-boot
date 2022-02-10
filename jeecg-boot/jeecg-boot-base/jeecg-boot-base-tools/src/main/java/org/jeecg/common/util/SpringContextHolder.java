@@ -3,6 +3,7 @@ package org.jeecg.common.util;
 
 import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -30,6 +31,10 @@ public class SpringContextHolder implements ApplicationContextAware {
     public static ApplicationContext getApplicationContext() {
         checkApplicationContext();
         return applicationContext;
+    }
+
+    public static String[] getBeanDefinitionNames() {
+        return applicationContext.getBeanDefinitionNames();
     }
 
     /**

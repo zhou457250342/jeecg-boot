@@ -1,6 +1,6 @@
-package org.jeecg.rec.engine.checker;
+package org.jeecg.modules.rec.engine.checker;
 
-import org.jeecg.rec.engine.model.TradeData;
+import org.jeecg.modules.rec.engine.model.TradeData;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -19,8 +19,8 @@ public class CheckResult {
     private String orderNo;
     private Date createTime;
     private String note;
-    private double amountSide;
-    private double amountMain;
+    private float amountSide;
+    private float amountMain;
     private CheckType type;
     private final List<TradeData> mainInfo = new ArrayList<>();
     private final List<TradeData> sideInfo = new ArrayList<>();

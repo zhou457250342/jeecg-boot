@@ -1,4 +1,4 @@
-package org.jeecg.rec.engine.config;
+package org.jeecg.modules.rec.engine.config;
 
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.service.IAppDictItemService;
@@ -31,5 +31,21 @@ public class RecConfig {
         } catch (Exception ex) {
             return null;
         }
+    }
+
+    public String zlHis_serviceUrl() {
+        return appDictItemService.getDicItemValue("1491713549572399105");
+    }
+
+    public String zlHis_channelName() {
+        return appDictItemService.getDicItemValue("1491714855489921026");
+    }
+
+    public String zlHis_token() {
+        return appDictItemService.getDicItemValue("1491714917116829698");
+    }
+
+    public String zlHis_key() {
+        return appDictItemService.getDicItemValue("1491714957054992385");
     }
 }

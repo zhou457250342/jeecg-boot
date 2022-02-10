@@ -1,4 +1,4 @@
-package org.jeecg.rec.engine.model;
+package org.jeecg.modules.rec.engine.model;
 
 import lombok.Data;
 

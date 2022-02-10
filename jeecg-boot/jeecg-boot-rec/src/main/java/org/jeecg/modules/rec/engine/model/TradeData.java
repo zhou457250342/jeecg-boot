@@ -1,7 +1,8 @@
-package org.jeecg.rec.engine.model;
+package org.jeecg.modules.rec.engine.model;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -12,6 +13,10 @@ import java.util.Date;
  */
 @Data
 public class TradeData {
+    /**
+     * 唯一标识
+     */
+    private String uniqueNo;
     /**
      * 交易流水号
      */

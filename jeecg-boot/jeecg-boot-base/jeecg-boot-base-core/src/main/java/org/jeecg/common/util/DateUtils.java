@@ -9,6 +9,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import cn.hutool.core.date.DateUtil;
 import org.springframework.util.StringUtils;
 
 /**
@@ -538,6 +539,35 @@ public class DateUtils extends PropertyEditorSupport {
     public static Date parseDate(String src, String pattern) throws ParseException {
         return getSDFormat(pattern).parse(src);
 
+    }
+
+    public static Date parseDateDef(String src, String pattern) {
+        try {
+            return getSDFormat(pattern).parse(src);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static String parseDate(Date date, String pattern) throws ParseException {
+        return DateUtil.format(date, pattern);
+    }
+
+    public static Date addDays(Date date, int amount) {
+        return org.apache.commons.lang.time.DateUtils.addDays(date, amount);
+    }
+
+    public static boolean isSameDay(Date date, Date date1) {
+        return org.apache.commons.lang.time.DateUtils.isSameDay(date, date1);
+    }
+
+    public static boolean isAfterT1Hours(Date date, int amount) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, 1);
+        calendar.set(Calendar.HOUR, amount);
+        calendar.set(Calendar.MINUTE, 0);
+        return new Date().after(calendar.getTime());
     }
 
     /**

@@ -1,4 +1,4 @@
-package org.jeecg.rec.engine.checker;
+package org.jeecg.modules.rec.engine.checker;
 
 /**
  * 校验记过

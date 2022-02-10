@@ -1,7 +1,7 @@
-package org.jeecg.rec.engine;
+package org.jeecg.modules.rec.engine;
 
-import org.jeecg.rec.engine.checker.CheckResult;
-import org.jeecg.rec.engine.checker.FullChecker;
+import org.jeecg.modules.rec.engine.checker.CheckResult;
+import org.jeecg.modules.rec.engine.checker.FullChecker;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;

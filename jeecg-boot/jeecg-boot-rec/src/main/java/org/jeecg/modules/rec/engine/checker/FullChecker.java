@@ -1,7 +1,7 @@
-package org.jeecg.rec.engine.checker;
+package org.jeecg.modules.rec.engine.checker;
 
-import org.jeecg.rec.engine.model.TradeData;
-import org.jeecg.rec.engine.resource.ResourceLoader;
+import org.jeecg.modules.rec.engine.model.TradeData;
+import org.jeecg.modules.rec.engine.resource.ResourceLoader;
 import org.apache.commons.collections.ListUtils;
 
 import java.util.*;
@@ -48,8 +48,8 @@ public class FullChecker {
                         if (it.isMain()) temp.getMainInfo().add(it);
                         else temp.getSideInfo().add(it);
                     });
-                    temp.setAmountSide(temp.getSideInfo().stream().mapToDouble(mp -> mp.getAmount()).sum());
-                    temp.setAmountMain(temp.getMainInfo().stream().mapToDouble(mp -> mp.getAmount()).sum());
+                    temp.setAmountSide((float) temp.getSideInfo().stream().mapToDouble(mp -> mp.getAmount()).sum());
+                    temp.setAmountMain((float) temp.getMainInfo().stream().mapToDouble(mp -> mp.getAmount()).sum());
                     temp.setType(temp.getAmountMain() == temp.getAmountSide() ? CheckType.success : CheckType.failed);
                     return temp;
                 }).collect(Collectors.toList());
