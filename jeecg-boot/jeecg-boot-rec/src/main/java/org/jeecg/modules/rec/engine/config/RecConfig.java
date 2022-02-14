@@ -48,4 +48,36 @@ public class RecConfig {
     public String zlHis_key() {
         return appDictItemService.getDicItemValue("1491714957054992385");
     }
+
+    public String alipay_gatewayUrl() {
+        return appDictItemService.getDicItemValue("1493065176342528001");
+    }
+
+    public String alipay_appId() {
+        return appDictItemService.getDicItemValue("1493065253861654529");
+    }
+
+    public String alipay_appPrivateKey() {
+        return appDictItemService.getDicItemValue("1493068180248506369");
+    }
+
+    public String alipay_format() {
+        return appDictItemService.getDicItemValue("1493068342140252162");
+    }
+
+    public String alipay_charset() {
+        return appDictItemService.getDicItemValue("1493068401019891713");
+    }
+
+    public String alipay_alipayPublicKey() {
+        return appDictItemService.getDicItemValue("1493068485782581249");
+    }
+
+    public String alipay_signType() {
+        return appDictItemService.getDicItemValue("1493068544297316353");
+    }
+
+    public String alipay_refundNotifyUrl() {
+        return appDictItemService.getDicItemValue("1493068633388527617");
+    }
 }

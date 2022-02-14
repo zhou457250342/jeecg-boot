@@ -52,6 +52,8 @@ public class BillingSyncJobWork {
                 models.add(model);
             });
         }
+        modRecModelService.remove(Wrappers.<ModRecModel>lambdaQuery().apply("create_time BETWEEN {0} AND {1}",
+                DateUtils.formatDate(syncDate, "yyyy-MM-dd 00:00:00"), DateUtils.formatDate(syncDate, "yyyy-MM-dd 23:59:59")));
         if (CollectionUtils.isNotEmpty(models)) {
             int flag = modRecModelService.insertBatchSomeColumn(models);
             if (flag != models.size()) throw new RecException("数据插入异常");

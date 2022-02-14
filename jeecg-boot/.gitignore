@@ -1,4 +1,5 @@
 /target/
 /.idea/
+/alipay/bill/
 *.iml
 rebel.xml

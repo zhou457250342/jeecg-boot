@@ -55,26 +55,31 @@ public class BillingSyncJob implements Job {
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        MybatisPlusSaasConfig.setTable("mod_rec_" + parameter);
-        Date recStartDate = recConfig.recStartDate();
-        if (recStartDate == null) throw new JobExecutionException("对账开始时间未配置");
-        recStartDate = DateUtils.addDays(recStartDate, -1);
-        ModRec modRec = modRecService.getOne(Wrappers.<ModRec>lambdaQuery().eq(ModRec::getName, parameter));
-        if (modRec == null) {
-            modRec = new ModRec();
-            modRec.setName(parameter);
-            modRec.setContent(new JSONObject());
+        try {
+            MybatisPlusSaasConfig.setTable("mod_rec_" + parameter);
+            Date recStartDate = recConfig.recStartDate();
+            if (recStartDate == null) throw new JobExecutionException("对账开始时间未配置");
+            recStartDate = DateUtils.addDays(recStartDate, -1);
+            ModRec modRec = modRecService.getOne(Wrappers.<ModRec>lambdaQuery().eq(ModRec::getName, parameter));
+            if (modRec == null) {
+                modRec = new ModRec();
+                modRec.setName(parameter);
+                modRec.setContent(new JSONObject());
+            }
+            String recDate = modRec.getContent().getString("recDate");
+            if (StringUtils.isNotEmpty(recDate)) {
+                Date date = DateUtils.parseDateDef(recDate, "yyyy-MM-dd");
+                if (date.after(recStartDate)) recStartDate = date;
+            }
+            while (true) {
+                recStartDate = DateUtils.addDays(recStartDate, 1);
+                if (DateUtils.isSameDay(new Date(), recStartDate)) break;
+                billingSyncJobWork.syncData(recStartDate, modRec, parameter);
+            }
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            MybatisPlusSaasConfig.clearTable();
         }
-        String recDate = modRec.getContent().getString("recDate");
-        if (StringUtils.isNotEmpty(recDate)) {
-            Date date = DateUtils.parseDateDef(recDate, "yyyy-MM-dd");
-            if (date.after(recStartDate)) recStartDate = date;
-        }
-        while (true) {
-            recStartDate = DateUtils.addDays(recStartDate, 1);
-            if (DateUtils.isSameDay(new Date(), recStartDate)) break;
-            billingSyncJobWork.syncData(recStartDate, modRec, parameter);
-        }
-        MybatisPlusSaasConfig.clearTable();
     }
 }
