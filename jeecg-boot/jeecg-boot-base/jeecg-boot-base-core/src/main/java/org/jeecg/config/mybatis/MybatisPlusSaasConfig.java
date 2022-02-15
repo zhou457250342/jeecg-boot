@@ -95,23 +95,18 @@ public class MybatisPlusSaasConfig {
     }
 
 
-    private static ThreadLocal<String> table = new ThreadLocal<>();
+    public static ThreadLocal<String> tableModRecModel = new ThreadLocal<>();
+    public static ThreadLocal<String> tableModRecComparison = new ThreadLocal<>();
 
     private DynamicTableNameInnerInterceptor dynTableName() {
         DynamicTableNameInnerInterceptor dynamicTableNameInnerInterceptor = new DynamicTableNameInnerInterceptor();
         HashMap<String, TableNameHandler> map = new HashMap<>();
-        map.put("mod_rec_model", (sql, tableName) -> table.get());
+        map.put("mod_rec_model", (sql, tableName) -> tableModRecModel.get());
+        map.put("mod_rec_comparison", (sql, tableName) -> tableModRecComparison.get());
         dynamicTableNameInnerInterceptor.setTableNameHandlerMap(map);
         return dynamicTableNameInnerInterceptor;
     }
 
-    public static void setTable(String tableName) {
-        table.set(tableName);
-    }
-
-    public static void clearTable() {
-        table.remove();
-    }
 //    /**
 //     * 下个版本会删除，现在为了避免缓存出现问题不得不配置
 //     * @return

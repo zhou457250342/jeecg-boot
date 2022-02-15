@@ -21,13 +21,26 @@ public class RecConfig {
     private IAppDictItemService appDictItemService;
 
     /**
+     * 账单下载开始时间
+     *
+     * @return
+     */
+    public Date recBillDownDate() {
+        try {
+            return DateUtils.parseDate(appDictItemService.getDicItemValue("1491329897692807170"), "yyyy-MM-dd");
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    /**
      * 对账开始时间
      *
      * @return
      */
     public Date recStartDate() {
         try {
-            return DateUtils.parseDate(appDictItemService.getDicItemValue("1491329897692807170"), "yyyy-MM-dd");
+            return DateUtils.parseDate(appDictItemService.getDicItemValue("1493479063265116161"), "yyyy-MM-dd");
         } catch (Exception ex) {
             return null;
         }

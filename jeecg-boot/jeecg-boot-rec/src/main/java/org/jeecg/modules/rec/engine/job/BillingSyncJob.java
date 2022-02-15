@@ -56,30 +56,30 @@ public class BillingSyncJob implements Job {
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         try {
-            MybatisPlusSaasConfig.setTable("mod_rec_" + parameter);
-            Date recStartDate = recConfig.recStartDate();
-            if (recStartDate == null) throw new JobExecutionException("对账开始时间未配置");
-            recStartDate = DateUtils.addDays(recStartDate, -1);
+            MybatisPlusSaasConfig.tableModRecModel.set("mod_rec_" + parameter);
+            Date recBillDownDate = recConfig.recBillDownDate();
+            if (recBillDownDate == null) throw new JobExecutionException("账单开始下载时间未配置");
+            recBillDownDate = DateUtils.addDays(recBillDownDate, -1);
             ModRec modRec = modRecService.getOne(Wrappers.<ModRec>lambdaQuery().eq(ModRec::getName, parameter));
             if (modRec == null) {
                 modRec = new ModRec();
                 modRec.setName(parameter);
                 modRec.setContent(new JSONObject());
             }
-            String recDate = modRec.getContent().getString("recDate");
+            String recDate = modRec.getContent().getString("billDownDate");
             if (StringUtils.isNotEmpty(recDate)) {
                 Date date = DateUtils.parseDateDef(recDate, "yyyy-MM-dd");
-                if (date.after(recStartDate)) recStartDate = date;
+                if (date.after(recBillDownDate)) recBillDownDate = date;
             }
             while (true) {
-                recStartDate = DateUtils.addDays(recStartDate, 1);
-                if (DateUtils.isSameDay(new Date(), recStartDate)) break;
-                billingSyncJobWork.syncData(recStartDate, modRec, parameter);
+                recBillDownDate = DateUtils.addDays(recBillDownDate, 1);
+                if (DateUtils.isSameDay(new Date(), recBillDownDate)) break;
+                billingSyncJobWork.syncData(recBillDownDate, modRec, parameter);
             }
         } catch (Exception ex) {
             throw ex;
         } finally {
-            MybatisPlusSaasConfig.clearTable();
+            MybatisPlusSaasConfig.tableModRecModel.remove();
         }
     }
 }

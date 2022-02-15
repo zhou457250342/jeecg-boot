@@ -169,15 +169,16 @@ public class SysDictItemController {
 			// 编辑页面校验
 			queryWrapper.ne(SysDictItem::getId,sysDictItem.getId());
 		}
-		num = sysDictItemService.count(queryWrapper);
-		if (num == 0) {
-			// 该值可用
-			return Result.ok("该值可用！");
-		} else {
-			// 该值不可用
-			log.info("该值不可用，系统中已存在！");
-			return Result.error("该值不可用，系统中已存在！");
-		}
+//		num = sysDictItemService.count(queryWrapper);
+//		if (num == 0) {
+//			// 该值可用
+//			return Result.ok("该值可用！");
+//		} else {
+//			// 该值不可用
+//			log.info("该值不可用，系统中已存在！");
+//			return Result.error("该值不可用，系统中已存在！");
+//		}
+		return Result.ok("该值可用！");
 	}
 	
 }

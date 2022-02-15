@@ -3,6 +3,7 @@ package org.jeecg.modules.rec.engine.checker;
 import org.jeecg.modules.rec.engine.model.TradeData;
 import org.jeecg.modules.rec.engine.resource.ResourceLoader;
 import org.apache.commons.collections.ListUtils;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,7 +22,7 @@ public class FullChecker {
      * @param sideLoader
      * @return
      */
-    public List<CheckResult> check(Date date, ResourceLoader mainLoader, ResourceLoader sideLoader) {
+    public static List<CheckResult> check(Date date, ResourceLoader mainLoader, ResourceLoader sideLoader) {
         List<TradeData> main = mainLoader.getList(date);
         List<TradeData> side = sideLoader.getList(date);
         return check(main, side);
@@ -34,8 +35,7 @@ public class FullChecker {
      * @param side
      * @return
      */
-    public List<CheckResult> check(List<TradeData> main, List<TradeData> side) {
-        if (main != null) main.forEach(op -> op.setMain(true));
+    public static List<CheckResult> check(List<TradeData> main, List<TradeData> side) {
         List<TradeData> list = ListUtils.union(main, side);
         List<CheckResult> result = list.stream().collect(Collectors.groupingBy(TradeData::getTradeNo))
                 .values().stream().map(op -> {

@@ -59,7 +59,7 @@ public class BillingSyncJobWork {
             if (flag != models.size()) throw new RecException("数据插入异常");
         }
         String date = DateUtils.formatDate(syncDate, "yyyy-MM-dd");
-        modRec.getContent().put("recDate", date);
+        modRec.getContent().put("billDownDate", date);
         modRec.setUptime(new Date());
         modRecService.saveOrUpdate(modRec);
     }
