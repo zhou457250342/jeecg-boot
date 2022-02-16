@@ -10,4 +10,6 @@ import java.util.List;
  */
 public interface IBaseService<T> extends IService<T> {
     int insertBatchSomeColumn(List<T> entityList);
+
+    int insertOrUpdateBatch(List<T> entityList);
 }

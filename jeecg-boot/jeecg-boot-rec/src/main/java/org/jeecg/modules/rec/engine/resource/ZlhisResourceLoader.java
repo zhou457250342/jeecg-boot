@@ -20,7 +20,7 @@ import java.util.List;
  * @Date: 2022/1/22 15:56
  */
 @Service
-public class ZlHisResourceLoader implements ResourceLoader {
+public class ZlhisResourceLoader implements ResourceLoader {
 
     @Autowired
     private ZlHisService zlHisService;

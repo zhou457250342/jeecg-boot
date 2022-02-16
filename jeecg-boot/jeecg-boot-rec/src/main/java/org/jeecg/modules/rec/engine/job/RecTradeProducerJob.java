@@ -4,13 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.quartz.DisallowConcurrentExecution;
 
 /**
- * 账单同步
+ * 交易追踪对账
  *
  * @Author: zhou x
- * @Date: 2022/2/9 15:34
+ * @Date: 2022/2/16 11:14
  */
-@DisallowConcurrentExecution
 @Slf4j
-public class BillingSyncJob extends TimeLineJob<BillingSyncJobWork> {
-
+@DisallowConcurrentExecution
+public class RecTradeProducerJob extends TimeLineJob<RecTradeProducerWork> {
 }

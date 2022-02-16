@@ -58,4 +58,11 @@ public class ModRec implements Serializable {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @ApiModelProperty(value = "uptime")
     private Date uptime;
+
+    /**
+     * type
+     */
+    @Excel(name = "type", width = 15)
+    @ApiModelProperty(value = "type")
+    private String type;
 }

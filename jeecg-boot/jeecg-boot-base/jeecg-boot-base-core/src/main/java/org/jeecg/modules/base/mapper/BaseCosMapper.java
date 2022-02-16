@@ -1,6 +1,7 @@
 package org.jeecg.modules.base.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import io.lettuce.core.dynamic.annotation.Param;
 
 import java.util.List;
 
@@ -16,4 +17,12 @@ public interface BaseCosMapper<T> extends BaseMapper<T> {
      * @return 影响行数
      */
     int insertBatchSomeColumn(List<T> entityList);
+
+    /**
+     * 批量更新或插入
+     *
+     * @param entities
+     * @return
+     */
+    int insertOrUpdateBatch(@Param("entities") List<T> entities);
 }

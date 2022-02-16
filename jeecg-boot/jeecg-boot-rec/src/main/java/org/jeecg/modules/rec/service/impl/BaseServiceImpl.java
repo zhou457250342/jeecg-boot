@@ -15,4 +15,8 @@ public class BaseServiceImpl<M extends BaseCosMapper<T>, T> extends ServiceImpl<
     public int insertBatchSomeColumn(List<T> entityList) {
         return baseMapper.insertBatchSomeColumn(entityList);
     }
+
+    public int insertOrUpdateBatch(List<T> entityList) {
+        return baseMapper.insertOrUpdateBatch(entityList);
+    }
 }

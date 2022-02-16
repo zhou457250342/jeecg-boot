@@ -18,36 +18,45 @@ import java.util.Date;
 /**
  * @Description: mod_rec_comparison
  * @Author: jeecg-boot
- * @Date:   2022-02-14
+ * @Date: 2022-02-14
  * @Version: V1.0
  */
 @Data
 @TableName("mod_rec_comparison")
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-@ApiModel(value="mod_rec_comparison对象", description="mod_rec_comparison")
+@ApiModel(value = "mod_rec_comparison对象", description = "mod_rec_comparison")
 public class ModRecComparison implements Serializable {
     private static final long serialVersionUID = 1L;
 
-	/**id*/
-	@TableId(type = IdType.ASSIGN_ID)
-    @ApiModelProperty(value = "id")
-    private String id;
-	/**tradeNo*/
-	@Excel(name = "tradeNo", width = 15)
+//	/**id*/
+//	@TableId(type = IdType.ASSIGN_ID)
+//    @ApiModelProperty(value = "id")
+//    private String id;
+    /**
+     * tradeNo
+     */
+    @Excel(name = "tradeNo", width = 15)
+    @TableId(type = IdType.NONE)
     @ApiModelProperty(value = "tradeNo")
     private String tradeNo;
-	/**status*/
-	@Excel(name = "status", width = 15)
+    /**
+     * status
+     */
+    @Excel(name = "status", width = 15)
     @ApiModelProperty(value = "status")
     private Integer status;
-	/**createTime*/
-	@JsonFormat(timezone = "GMT+8",pattern = "yyyy-MM-dd")
-    @DateTimeFormat(pattern="yyyy-MM-dd")
+    /**
+     * createTime
+     */
+    @JsonFormat(timezone = "GMT+8", pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     @ApiModelProperty(value = "createTime")
     private Date createTime;
-	/**result*/
-	@Excel(name = "result", width = 15)
+    /**
+     * result
+     */
+    @Excel(name = "result", width = 15)
     @ApiModelProperty(value = "result")
     private String result;
 }

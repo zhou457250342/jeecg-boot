@@ -1,12 +1,15 @@
 package org.jeecg.modules.rec.engine.service;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.annotation.Obsolete;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.common.util.SpringContextHolder;
 import org.jeecg.config.mybatis.MybatisPlusSaasConfig;
+import org.jeecg.modules.rec.engine.checker.CheckResult;
 import org.jeecg.modules.rec.engine.checker.FullChecker;
 import org.jeecg.modules.rec.engine.model.RecException;
 import org.jeecg.modules.rec.engine.model.TradeData;
@@ -42,16 +45,21 @@ public class RecService {
         this.modRecModelService = SpringContextHolder.getBean(IModRecModelService.class);
     }
 
+    public RecService() {
+        this(null, null);
+    }
+
     /**
-     * 执行对账
+     * 系统天对账
      *
      * @param date
      */
-    public void execute(Date date) {
-        if (validateCanRec()) throw new RecException("账单未下载完毕，无法对账");
-        List<TradeData> mainList = repairData(searchBillList(mainName, date, null), true);
-        List<TradeData> sideList = repairData(searchBillList(sideName, date, null), false);
-        FullChecker.check(mainList, sideList);
+    @Obsolete
+    public void recDay(Date date) {
+//        if (validateCanRec()) throw new RecException("账单未下载完毕，无法对账");
+//        List<TradeData> mainList = repairData(searchBillList(mainName, date, null), true);
+//        List<TradeData> sideList = repairData(searchBillList(sideName, date, null), false);
+//        FullChecker.check(mainList, sideList);
     }
 
     /**
@@ -64,7 +72,7 @@ public class RecService {
         ModRec modRecSide = modRecService.getOne(Wrappers.<ModRec>lambdaQuery().eq(ModRec::getName, sideName));
         if (modRec == null || modRecSide == null) return false;
         String date = DateUtils.formatDate(DateUtils.addDays(new Date(), -1), "yyyy-MM-dd");
-        return date.equals(modRec.getContent().getString("billDownDate")) && date.equals(modRecSide.getContent().getString("billDownDate"));
+        return date.equals(modRec.getContent().getString("billingDownDate")) && date.equals(modRecSide.getContent().getString("billingDownDate"));
     }
 
     /**
@@ -115,21 +123,33 @@ public class RecService {
     }
 
     /**
-     * 保存对账结果
+     * 对账记录
      *
      * @return
      */
     public void saveRecResult(List<ModRecComparison> modRecComparisons) {
         if (CollectionUtils.isEmpty(modRecComparisons)) return;
         try {
-            MybatisPlusSaasConfig.tableModRecComparison.set("mod_rec_" + mainName + "_" + sideName);
-            modRecComparisons.forEach(op -> {
-                modRecComparisonService.saveOrUpdate(op, Wrappers.<ModRecComparison>lambdaQuery().eq(ModRecComparison::getTradeNo, op.getTradeNo()));
-            });
+            MybatisPlusSaasConfig.tableModRecComparison.set("mod_rec_res_" + mainName + "_" + sideName);
+            modRecComparisonService.insertOrUpdateBatch(modRecComparisons);
         } catch (Exception ex) {
-            throw new RecException("账单保存失败", ex);
+            throw new RecException("对账记录保存失败", ex);
         } finally {
             MybatisPlusSaasConfig.tableModRecComparison.remove();
         }
+    }
+
+    /**
+     * 获取账单下载日期
+     *
+     * @param name
+     * @return
+     */
+    public Date billingDownExcDate(String name) {
+        ModRec modRec = modRecService.getOne(Wrappers.<ModRec>lambdaQuery()
+                .eq(ModRec::getName, name)
+                .eq(ModRec::getType, "billingDown"));
+        if (modRec == null || modRec.getContent() == null) return null;
+        return DateUtils.parseDateDef(modRec.getContent().getString("excDate"), "yyyy-MM-dd");
     }
 }

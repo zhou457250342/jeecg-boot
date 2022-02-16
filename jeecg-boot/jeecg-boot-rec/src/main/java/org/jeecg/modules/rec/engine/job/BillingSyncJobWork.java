@@ -21,46 +21,56 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 账单同步
+ *
  * @Author: zhou x
  * @Date: 2022/2/10 15:55
  */
 @Component
-public class BillingSyncJobWork {
+public class BillingSyncJobWork extends TimeLineJobWork {
 
-    @Autowired
-    private IModRecModelService modRecModelService;
-    @Autowired
-    private IModRecService modRecService;
+    @Override
+    protected void execute(Date syncDate, ModRec modRec, String name) {
+        try {
+            MybatisPlusSaasConfig.tableModRecModel.set("mod_rec_" + name);
+            String beanName = name + "ResourceLoader";
+            ResourceLoader resourceLoader = SpringContextHolder.getBean(beanName);
+            if (resourceLoader == null) throw new RecException("ResourceLoader is null");
+            List<TradeData> tradeDataList = resourceLoader.getList(syncDate);
+            List<ModRecModel> models = new ArrayList<>();
+            if (CollectionUtils.isNotEmpty(tradeDataList)) {
+                tradeDataList.forEach(op -> {
+                    ModRecModel model = new ModRecModel();
+                    model.setTradeNo(op.getTradeNo());
+                    model.setOrderNo(op.getOrderNo());
+                    model.setBussNo(op.getOperationNo());
+                    model.setCreateTime(op.getCreateTime());
+                    model.setUniqueNo(op.getUniqueNo());
+                    model.setNote(op.getNote());
+                    model.setAmount(op.getAmount());
+                    models.add(model);
+                });
+            }
+            modRecModelService.remove(Wrappers.<ModRecModel>lambdaQuery().apply("create_time BETWEEN {0} AND {1}",
+                    DateUtils.formatDate(syncDate, "yyyy-MM-dd 00:00:00"), DateUtils.formatDate(syncDate, "yyyy-MM-dd 23:59:59")));
+            if (CollectionUtils.isNotEmpty(models)) {
+                int flag = modRecModelService.insertBatchSomeColumn(models);
+                if (flag != models.size()) throw new RecException("数据插入异常");
+            }
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            MybatisPlusSaasConfig.tableModRecModel.remove();
+        }
+    }
 
-    @Transactional(rollbackFor = Exception.class)
-    public void syncData(Date syncDate, ModRec modRec, String name) throws RecException {
-        String beanName = name + "ResourceLoader";
-        ResourceLoader resourceLoader = SpringContextHolder.getBean(beanName);
-        if (resourceLoader == null) throw new RecException("ResourceLoader is null");
-        List<TradeData> tradeDataList = resourceLoader.getList(syncDate);
-        List<ModRecModel> models = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(tradeDataList)) {
-            tradeDataList.forEach(op -> {
-                ModRecModel model = new ModRecModel();
-                model.setTradeNo(op.getTradeNo());
-                model.setOrderNo(op.getOrderNo());
-                model.setBussNo(op.getOperationNo());
-                model.setCreateTime(op.getCreateTime());
-                model.setUniqueNo(op.getUniqueNo());
-                model.setNote(op.getNote());
-                model.setAmount(op.getAmount());
-                models.add(model);
-            });
-        }
-        modRecModelService.remove(Wrappers.<ModRecModel>lambdaQuery().apply("create_time BETWEEN {0} AND {1}",
-                DateUtils.formatDate(syncDate, "yyyy-MM-dd 00:00:00"), DateUtils.formatDate(syncDate, "yyyy-MM-dd 23:59:59")));
-        if (CollectionUtils.isNotEmpty(models)) {
-            int flag = modRecModelService.insertBatchSomeColumn(models);
-            if (flag != models.size()) throw new RecException("数据插入异常");
-        }
-        String date = DateUtils.formatDate(syncDate, "yyyy-MM-dd");
-        modRec.getContent().put("billDownDate", date);
-        modRec.setUptime(new Date());
-        modRecService.saveOrUpdate(modRec);
+    @Override
+    public Date startDate() {
+        return recConfig.recBillDownDate();
+    }
+
+    @Override
+    public String thresholdName() {
+        return "billingDown";
     }
 }
