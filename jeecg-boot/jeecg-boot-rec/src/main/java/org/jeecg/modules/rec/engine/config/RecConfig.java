@@ -62,6 +62,7 @@ public class RecConfig {
         return appDictItemService.getDicItemValue("1491714957054992385");
     }
 
+
     public String alipay_gatewayUrl() {
         return appDictItemService.getDicItemValue("1493065176342528001");
     }
@@ -92,5 +93,9 @@ public class RecConfig {
 
     public String alipay_refundNotifyUrl() {
         return appDictItemService.getDicItemValue("1493068633388527617");
+    }
+
+    public String alipay_bill_note() {
+        return appDictItemService.getDicItemValue("1494229050311725057");
     }
 }

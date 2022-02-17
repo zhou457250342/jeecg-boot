@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.modules.rec.engine.model.RecException;
+import org.jeecg.modules.rec.engine.model.RecExecType;
 import org.jeecg.modules.rec.engine.service.RecService;
 import org.jeecg.modules.rec.entity.ModRec;
 import org.jeecg.modules.rec.entity.ModRecComparison;
@@ -33,7 +34,7 @@ public class RecTradeProducerWork extends TimeLineJobWork {
         String[] split = name.split("\\|");
         String[] splitH = split[1].split("_");
         RecService recService = new RecService(splitH[0], splitH[1]);
-        Date billDownDate = recService.billingDownExcDate(split[0]);
+        Date billDownDate = recService.excDate(split[0], RecExecType.billingDown);
         if (billDownDate == null || syncDate.after(billDownDate)) throw new RecException("账单未下载，无法处理");
         List<ModRecModel> models = recService.searchBillList(split[0], syncDate, null);
         if (CollectionUtils.isEmpty(models)) return;

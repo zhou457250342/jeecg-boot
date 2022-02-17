@@ -21,7 +21,9 @@ public class CheckResult {
     private String note;
     private float amountSide;
     private float amountMain;
+    private CheckStatus status;
     private CheckType type;
     private final List<TradeData> mainInfo = new ArrayList<>();
     private final List<TradeData> sideInfo = new ArrayList<>();
+    private final List<CheckTradeItem> checkItems = new ArrayList<>();
 }

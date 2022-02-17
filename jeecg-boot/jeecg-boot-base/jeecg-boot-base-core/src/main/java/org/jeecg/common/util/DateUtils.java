@@ -557,6 +557,10 @@ public class DateUtils extends PropertyEditorSupport {
         return org.apache.commons.lang.time.DateUtils.addDays(date, amount);
     }
 
+    public static Date addHours(Date date, int amount) {
+        return org.apache.commons.lang.time.DateUtils.addHours(date, amount);
+    }
+
     public static boolean isSameDay(Date date, Date date1) {
         return org.apache.commons.lang.time.DateUtils.isSameDay(date, date1);
     }
@@ -568,6 +572,15 @@ public class DateUtils extends PropertyEditorSupport {
         calendar.set(Calendar.HOUR, amount);
         calendar.set(Calendar.MINUTE, 0);
         return new Date().after(calendar.getTime());
+    }
+
+    public static Date adjustDate(Date date, int amount, int hour, int minute) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, amount);
+        calendar.add(Calendar.HOUR, hour);
+        calendar.add(Calendar.MINUTE, minute);
+        return calendar.getTime();
     }
 
     /**

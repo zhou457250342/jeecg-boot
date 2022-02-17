@@ -81,9 +81,11 @@ public class AlipayService {
      */
     private List<TradeData> parseBillExcel(File file) throws Exception {
         List<TradeData> tradeDataList = new ArrayList<>();
+        // note-> ||挂号||门诊缴费||住院缴费||核酸检测||PH挂号||PH门诊缴费||PH住院缴费||PH核酸检测||
+        String tradeNote = recConfig.alipay_bill_note();
         ExcelUtils.readCSV(file, op -> {
             if ("#".equals(op.get(0).substring(0, 1)) || "支".equals(op.get(0).substring(0, 1))) return;
-            if (!"挂号||门诊缴费||住院缴费||核酸检测".contains(op.get(3))) return;
+            if (!tradeNote.contains("||" + op.get(3) + "||")) return;
             TradeData tradeData = new TradeData();
             tradeData.setTradeNo(StringUtils.replaceBlank(op.get(0)));
             tradeData.setOrderNo(StringUtils.replaceBlank(op.get(1)));

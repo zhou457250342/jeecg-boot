@@ -1,6 +1,5 @@
 package org.jeecg.modules.rec.engine.service;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -9,10 +8,13 @@ import org.apache.http.annotation.Obsolete;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.common.util.SpringContextHolder;
 import org.jeecg.config.mybatis.MybatisPlusSaasConfig;
+import org.jeecg.modules.rec.engine.model.RecParameter;
 import org.jeecg.modules.rec.engine.checker.CheckResult;
 import org.jeecg.modules.rec.engine.checker.FullChecker;
 import org.jeecg.modules.rec.engine.model.RecException;
+import org.jeecg.modules.rec.engine.model.RecExecType;
 import org.jeecg.modules.rec.engine.model.TradeData;
+import org.jeecg.modules.rec.engine.model.TradeDataRec;
 import org.jeecg.modules.rec.entity.ModRec;
 import org.jeecg.modules.rec.entity.ModRecComparison;
 import org.jeecg.modules.rec.entity.ModRecModel;
@@ -20,7 +22,7 @@ import org.jeecg.modules.rec.service.IModRecComparisonService;
 import org.jeecg.modules.rec.service.IModRecModelService;
 import org.jeecg.modules.rec.service.IModRecService;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -36,6 +38,7 @@ public class RecService {
     private IModRecService modRecService;
     private IModRecModelService modRecModelService;
     private IModRecComparisonService modRecComparisonService;
+    private FullChecker fullChecker;
 
     public RecService(String mainName, String sideName) {
         this.mainName = mainName;
@@ -43,10 +46,7 @@ public class RecService {
         this.modRecService = SpringContextHolder.getBean(IModRecService.class);
         this.modRecComparisonService = SpringContextHolder.getBean(IModRecComparisonService.class);
         this.modRecModelService = SpringContextHolder.getBean(IModRecModelService.class);
-    }
-
-    public RecService() {
-        this(null, null);
+        this.fullChecker = SpringContextHolder.getBean(FullChecker.class);
     }
 
     /**
@@ -56,10 +56,20 @@ public class RecService {
      */
     @Obsolete
     public void recDay(Date date) {
-//        if (validateCanRec()) throw new RecException("账单未下载完毕，无法对账");
+        if (validateCanRec()) throw new RecException("目前不可进行系统对账");
 //        List<TradeData> mainList = repairData(searchBillList(mainName, date, null), true);
 //        List<TradeData> sideList = repairData(searchBillList(sideName, date, null), false);
 //        FullChecker.check(mainList, sideList);
+    }
+
+    /**
+     * 系统交易追踪对账
+     */
+    public CheckResult recTrade(ModRecComparison modRecComparison, RecParameter parameter) {
+        List<ModRecModel> mainList = this.searchBillList(mainName, null, modRecComparison.getTradeNo());
+        List<ModRecModel> sideList = this.searchBillList(sideName, null, modRecComparison.getTradeNo());
+        List<CheckResult> result = fullChecker.check(repairData(mainName, mainList, true), repairData(sideName, sideList, false), parameter);
+        return CollectionUtils.isNotEmpty(result) ? result.get(0) : null;
     }
 
     /**
@@ -68,11 +78,14 @@ public class RecService {
      * @return
      */
     public boolean validateCanRec() {
-        ModRec modRec = modRecService.getOne(Wrappers.<ModRec>lambdaQuery().eq(ModRec::getName, mainName));
-        ModRec modRecSide = modRecService.getOne(Wrappers.<ModRec>lambdaQuery().eq(ModRec::getName, sideName));
-        if (modRec == null || modRecSide == null) return false;
-        String date = DateUtils.formatDate(DateUtils.addDays(new Date(), -1), "yyyy-MM-dd");
-        return date.equals(modRec.getContent().getString("billingDownDate")) && date.equals(modRecSide.getContent().getString("billingDownDate"));
+        Date mainBill = excDate(mainName, RecExecType.billingDown);
+        Date sideBill = excDate(sideName, RecExecType.billingDown);
+        Date mainPro = excDate(mainName, RecExecType.recTradeProducer);
+        Date sidePro = excDate(sideName, RecExecType.recTradeProducer);
+        if (mainBill == null || sideBill == null || mainPro == null || sidePro == null) return false;
+        Date downDate = DateUtils.addDays(new Date(), -1);
+        return DateUtils.isSameDay(mainBill, downDate) && DateUtils.isSameDay(sideBill, downDate) &&
+                DateUtils.isSameDay(mainPro, downDate) && DateUtils.isSameDay(sidePro, downDate);
     }
 
     /**
@@ -104,22 +117,22 @@ public class RecService {
      * @param models
      * @return
      */
-    public List<TradeData> repairData(List<ModRecModel> models, boolean isMain) {
-        if (CollectionUtils.isEmpty(models)) return null;
-        List<TradeData> dataList = new ArrayList<>();
-        models.forEach(op -> {
-            TradeData tradeData = new TradeData();
-            tradeData.setOperationNo(op.getBussNo());
-            tradeData.setAmount(op.getAmount());
-            tradeData.setCreateTime(op.getCreateTime());
-            tradeData.setNote(op.getNote());
-            tradeData.setTradeNo(op.getTradeNo());
-            tradeData.setUniqueNo(op.getUniqueNo());
-            tradeData.setOrderNo(op.getOrderNo());
-            tradeData.setMain(isMain);
-            dataList.add(tradeData);
-        });
-        return dataList;
+    public TradeDataRec repairData(String name, List<ModRecModel> models, boolean isMain) {
+        TradeDataRec tradeDataRec = new TradeDataRec(name, isMain);
+        if (CollectionUtils.isNotEmpty(models)) {
+            models.forEach(op -> {
+                TradeData tradeData = new TradeData();
+                tradeData.setOperationNo(op.getBussNo());
+                tradeData.setAmount(op.getAmount());
+                tradeData.setCreateTime(op.getCreateTime());
+                tradeData.setNote(op.getNote());
+                tradeData.setTradeNo(op.getTradeNo());
+                tradeData.setUniqueNo(op.getUniqueNo());
+                tradeData.setOrderNo(op.getOrderNo());
+                tradeDataRec.add(tradeData);
+            });
+        }
+        return tradeDataRec;
     }
 
     /**
@@ -140,15 +153,65 @@ public class RecService {
     }
 
     /**
-     * 获取账单下载日期
+     * 对账记录
+     *
+     * @return
+     */
+    public void saveRecResult(ModRecComparison modRecComparison) {
+        try {
+            MybatisPlusSaasConfig.tableModRecComparison.set("mod_rec_res_" + mainName + "_" + sideName);
+            modRecComparisonService.saveOrUpdate(modRecComparison);
+        } catch (Exception ex) {
+            throw new RecException("对账记录保存失败", ex);
+        } finally {
+            MybatisPlusSaasConfig.tableModRecComparison.remove();
+        }
+    }
+
+    /**
+     * 对账记录移除
+     *
+     * @param id
+     */
+    public void removeById(Serializable id) {
+        try {
+            MybatisPlusSaasConfig.tableModRecComparison.set("mod_rec_res_" + mainName + "_" + sideName);
+            modRecComparisonService.removeById(id);
+        } catch (Exception ex) {
+            throw new RecException("对账记录删除失败", ex);
+        } finally {
+            MybatisPlusSaasConfig.tableModRecComparison.remove();
+        }
+    }
+
+    /**
+     * 查找对账记录
+     *
+     * @return
+     */
+    public List<ModRecComparison> searchRecResult(int status, int limit) {
+        try {
+            MybatisPlusSaasConfig.tableModRecComparison.set("mod_rec_res_" + mainName + "_" + sideName);
+            return modRecComparisonService.list(Wrappers.<ModRecComparison>lambdaQuery()
+                    .eq(ModRecComparison::getStatus, status).orderByAsc(ModRecComparison::getCreateTime)
+                    .last("limit " + limit));
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            MybatisPlusSaasConfig.tableModRecComparison.remove();
+        }
+    }
+
+    /**
+     * 获取进度阶段时间
      *
      * @param name
      * @return
      */
-    public Date billingDownExcDate(String name) {
+    public Date excDate(String name, RecExecType type) {
         ModRec modRec = modRecService.getOne(Wrappers.<ModRec>lambdaQuery()
                 .eq(ModRec::getName, name)
-                .eq(ModRec::getType, "billingDown"));
+                .eq(ModRec::getType, type.toString()));
         if (modRec == null || modRec.getContent() == null) return null;
         return DateUtils.parseDateDef(modRec.getContent().getString("excDate"), "yyyy-MM-dd");
     }

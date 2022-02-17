@@ -32,4 +32,9 @@ public class AlipayResourceLoader implements ResourceLoader {
             throw new RecException("alipay账单获取失败", e);
         }
     }
+
+    @Override
+    public boolean validateTradeUnKnown(TradeData data) {
+        return false;
+    }
 }

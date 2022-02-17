@@ -25,7 +25,6 @@ public class ZlhisResourceLoader implements ResourceLoader {
     @Autowired
     private ZlHisService zlHisService;
 
-
     @Override
     public List<TradeData> getList(Date date) {
         if (!DateUtils.isAfterT1Hours(date, 2)) throw new RecException("账单还未出");
@@ -72,5 +71,10 @@ public class ZlhisResourceLoader implements ResourceLoader {
         } catch (Exception e) {
             throw new RecException("zlHis账单获取失败", e);
         }
+    }
+
+    @Override
+    public boolean validateTradeUnKnown(TradeData data) {
+        return false;
     }
 }
