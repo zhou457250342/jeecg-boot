@@ -8,17 +8,17 @@
     :okButtonProps="{ class:{'jee-hidden': disableSubmit} }"
     @cancel="handleCancel"
     cancelText="关闭">
-    <mod-rec-test-form ref="realForm" @ok="submitCallback" :disabled="disableSubmit"></mod-rec-test-form>
+    <mod-rec-measure-form ref="realForm" @ok="submitCallback" :disabled="disableSubmit"></mod-rec-measure-form>
   </j-modal>
 </template>
 
 <script>
 
-  import ModRecTestForm from './ModRecTestForm'
+  import ModRecMeasureForm from './ModRecMeasureForm'
   export default {
-    name: 'ModRecTestModal',
+    name: 'ModRecMeasureModal',
     components: {
-      ModRecTestForm
+      ModRecMeasureForm
     },
     data () {
       return {

@@ -4,6 +4,26 @@
     <div class="table-page-search-wrapper">
       <a-form layout="inline" @keyup.enter.native="searchQuery">
         <a-row :gutter="24">
+          <a-col :xl="6" :lg="7" :md="8" :sm="24">
+            <a-form-item label="交易流水号">
+              <a-input placeholder="请输入交易流水号" v-model="queryParam.tradeNo"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :xl="6" :lg="7" :md="8" :sm="24">
+            <a-form-item label="交易时间">
+              <j-date placeholder="请选择交易时间" v-model="queryParam.createTime"></j-date>
+            </a-form-item>
+          </a-col>
+          <a-col :xl="6" :lg="7" :md="8" :sm="24">
+            <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
+              <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
+              <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
+              <a @click="handleToggleSearch" style="margin-left: 8px">
+                {{ toggleSearchStatus ? '收起' : '展开' }}
+                <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>
+              </a>
+            </span>
+          </a-col>
         </a-row>
       </a-form>
     </div>
@@ -12,7 +32,7 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-      <a-button type="primary" icon="download" @click="handleExportXls('mod_rec_test')">导出</a-button>
+      <a-button type="primary" icon="download" @click="handleExportXls('mod_rec_result')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
       </a-upload>
@@ -89,7 +109,7 @@
       </a-table>
     </div>
 
-    <mod-rec-test-modal ref="modalForm" @ok="modalFormOk"></mod-rec-test-modal>
+    <mod-rec-result-modal ref="modalForm" @ok="modalFormOk"></mod-rec-result-modal>
   </a-card>
 </template>
 
@@ -98,17 +118,17 @@
   import '@/assets/less/TableExpand.less'
   import { mixinDevice } from '@/utils/mixin'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
-  import ModRecTestModal from './modules/ModRecTestModal'
+  import ModRecResultModal from './modules/ModRecResultModal'
 
   export default {
-    name: 'ModRecTestList',
+    name: 'ModRecResultList',
     mixins:[JeecgListMixin, mixinDevice],
     components: {
-      ModRecTestModal
+      ModRecResultModal
     },
     data () {
       return {
-        description: 'mod_rec_test管理页面',
+        description: 'mod_rec_result管理页面',
         // 表头
         columns: [
           {
@@ -122,9 +142,34 @@
             }
           },
           {
-            title:'姓名',
+            title:'交易流水号',
             align:"center",
-            dataIndex: 'name'
+            dataIndex: 'tradeNo'
+          },
+          {
+            title:'订单号',
+            align:"center",
+            dataIndex: 'orderNo'
+          },
+          {
+            title:'主系统金额',
+            align:"center",
+            dataIndex: 'mainAmount'
+          },
+          {
+            title:'支付系统金额',
+            align:"center",
+            dataIndex: 'sideAmount'
+          },
+          {
+            title:'对账结果',
+            align:"center",
+            dataIndex: 'status'
+          },
+          {
+            title:'处理时间',
+            align:"center",
+            dataIndex: 'createTime'
           },
           {
             title: '操作',
@@ -136,11 +181,11 @@
           }
         ],
         url: {
-          list: "/dd/modRecTest/list",
-          delete: "/dd/modRecTest/delete",
-          deleteBatch: "/dd/modRecTest/deleteBatch",
-          exportXlsUrl: "/dd/modRecTest/exportXls",
-          importExcelUrl: "dd/modRecTest/importExcel",
+          list: "/rec/modRecResult/list",
+          delete: "/rec/modRecResult/delete",
+          deleteBatch: "/rec/modRecResult/deleteBatch",
+          exportXlsUrl: "/rec/modRecResult/exportXls",
+          importExcelUrl: "rec/modRecResult/importExcel",
           
         },
         dictOptions:{},
@@ -160,7 +205,12 @@
       },
       getSuperFieldList(){
         let fieldList=[];
-        fieldList.push({type:'string',value:'name',text:'姓名'})
+        fieldList.push({type:'string',value:'tradeNo',text:'交易流水号',dictCode:''})
+        fieldList.push({type:'string',value:'orderNo',text:'订单号',dictCode:''})
+        fieldList.push({type:'BigDecimal',value:'mainAmount',text:'主系统金额',dictCode:''})
+        fieldList.push({type:'BigDecimal',value:'sideAmount',text:'支付系统金额',dictCode:''})
+        fieldList.push({type:'string',value:'status',text:'对账结果',dictCode:''})
+        fieldList.push({type:'date',value:'createTime',text:'交易时间'})
         this.superFieldList = fieldList
       }
     }

@@ -46,11 +46,10 @@ public class RecTradeConsumerJob implements Job {
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        String[] split = parameter.split("_");
-        RecService recService = new RecService(split[0], split[1]);
+        RecService recService = new RecService(parameter);
         if (recService.validateCanRec()) throw new RecException("目前不可进行系统对账");
         RecParameter parameter = new RecParameter();
-        parameter.setDownDate(recService.excDate(split[0], RecExecType.billingDown));
+        parameter.setDownDate(recService.excDate(recService.mainName, RecExecType.billingDown));
         parameter.setStartDate(recConfig.recBillDownDate());
         if (parameter.getDownDate() == null || parameter.getStartDate() == null)
             throw new RecException("对账参数异常，无法进行系统对账");

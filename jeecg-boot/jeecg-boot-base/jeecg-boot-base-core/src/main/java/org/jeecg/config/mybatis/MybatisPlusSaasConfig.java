@@ -84,8 +84,8 @@ public class MybatisPlusSaasConfig {
                 return true;
             }
         }));
-        interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
         interceptor.addInnerInterceptor(dynTableName());
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
         return interceptor;
     }
 

@@ -5,16 +5,13 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.common.util.SpringContextHolder;
 import org.jeecg.config.mybatis.MybatisPlusSaasConfig;
+import org.jeecg.modules.rec.engine.job.timeLine.TimeLineJobWork;
 import org.jeecg.modules.rec.engine.model.RecException;
 import org.jeecg.modules.rec.engine.model.TradeData;
 import org.jeecg.modules.rec.engine.resource.ResourceLoader;
 import org.jeecg.modules.rec.entity.ModRec;
 import org.jeecg.modules.rec.entity.ModRecModel;
-import org.jeecg.modules.rec.service.IModRecModelService;
-import org.jeecg.modules.rec.service.IModRecService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;

@@ -1,4 +1,4 @@
-package org.jeecg.modules.rec.engine.job;
+package org.jeecg.modules.rec.engine.job.timeLine;
 
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import me.zhyd.oauth.utils.StringUtils;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.common.util.SpringContextHolder;
-import org.jeecg.config.mybatis.MybatisPlusSaasConfig;
 import org.jeecg.modules.rec.engine.config.RecConfig;
 import org.jeecg.modules.rec.entity.ModRec;
 import org.jeecg.modules.rec.service.IModRecService;

@@ -2,13 +2,13 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.jeecg.modules.rec.mapper.ModRecComparisonMapper">
     <insert id="insertOrUpdateBatch" keyProperty="tradeNo" useGeneratedKeys="true">
-        insert into mod_rec_comparison(trade_no, status, result, create_time)
+        insert into mod_rec_comparison(trade_no, order_no, status, result, create_time)
         values
         <foreach collection="entities" item="entity" separator=",">
-            (#{entity.tradeNo}, #{entity.status}, #{entity.result}, #{entity.createTime})
+            (#{entity.tradeNo}, #{entity.orderNo}, #{entity.status}, #{entity.result}, #{entity.createTime})
         </foreach>
         on duplicate key update
-        trade_no = values(trade_No) , status = values(status) , result = values(result) , create_time =
+        trade_no = values(trade_No) , order_no = values(order_no), status = values(status) , result = values(result) , create_time =
         values(create_time)
     </insert>
 </mapper>

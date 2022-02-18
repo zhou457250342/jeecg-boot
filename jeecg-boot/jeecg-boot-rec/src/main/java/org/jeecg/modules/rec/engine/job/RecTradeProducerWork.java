@@ -1,8 +1,8 @@
 package org.jeecg.modules.rec.engine.job;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import org.jeecg.common.util.DateUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.jeecg.modules.rec.engine.job.timeLine.TimeLineJobWork;
 import org.jeecg.modules.rec.engine.model.RecException;
 import org.jeecg.modules.rec.engine.model.RecExecType;
 import org.jeecg.modules.rec.engine.service.RecService;
@@ -32,16 +32,17 @@ public class RecTradeProducerWork extends TimeLineJobWork {
     @Override
     protected void execute(Date syncDate, ModRec modRec, String name) {
         String[] split = name.split("\\|");
-        String[] splitH = split[1].split("_");
-        RecService recService = new RecService(splitH[0], splitH[1]);
+        RecService recService = new RecService(split[1]);
         Date billDownDate = recService.excDate(split[0], RecExecType.billingDown);
         if (billDownDate == null || syncDate.after(billDownDate)) throw new RecException("账单未下载，无法处理");
-        List<ModRecModel> models = recService.searchBillList(split[0], syncDate, null);
+        List<ModRecModel> models = recService.searchBillList(syncDate, null, split[0]);
         if (CollectionUtils.isEmpty(models)) return;
         List<ModRecComparison> comList = new ArrayList<>();
         models.forEach(op -> {
             ModRecComparison com = new ModRecComparison();
             com.setTradeNo(op.getTradeNo());
+            if (StringUtils.isNotBlank(op.getOrderNo()))
+                com.setOrderNo(op.getOrderNo());
             com.setCreateTime(op.getCreateTime());
             com.setStatus(0);
             comList.add(com);

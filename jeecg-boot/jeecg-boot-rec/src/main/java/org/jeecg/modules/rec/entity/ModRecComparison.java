@@ -41,6 +41,12 @@ public class ModRecComparison implements Serializable {
     @ApiModelProperty(value = "tradeNo")
     private String tradeNo;
     /**
+     * orderNo
+     */
+    @Excel(name = "orderNo", width = 15)
+    @ApiModelProperty(value = "orderNo")
+    private String orderNo;
+    /**
      * status
      */
     @Excel(name = "status", width = 15)

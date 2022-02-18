@@ -4,8 +4,28 @@
       <a-form-model ref="form" :model="model" :rules="validatorRules" slot="detail">
         <a-row>
           <a-col :span="24">
-            <a-form-model-item label="姓名" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="name">
-              <a-input v-model="model.name" placeholder="请输入姓名"  ></a-input>
+            <a-form-model-item label="交易流水号" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="tradeNo">
+              <a-input v-model="model.tradeNo" placeholder="请输入交易流水号"  ></a-input>
+            </a-form-model-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-model-item label="订单号" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="orderNo">
+              <a-input v-model="model.orderNo" placeholder="请输入订单号"  ></a-input>
+            </a-form-model-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-model-item label="主系统金额" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="mainAmount">
+              <a-input-number v-model="model.mainAmount" placeholder="请输入主系统金额" style="width: 100%" />
+            </a-form-model-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-model-item label="支付系统金额" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="sideAmount">
+              <a-input-number v-model="model.sideAmount" placeholder="请输入支付系统金额" style="width: 100%" />
+            </a-form-model-item>
+          </a-col>
+          <a-col :span="24">
+            <a-form-model-item label="对账结果" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="status">
+              <a-input v-model="model.status" placeholder="请输入对账结果"  ></a-input>
             </a-form-model-item>
           </a-col>
         </a-row>
@@ -20,7 +40,7 @@
   import { validateDuplicateValue } from '@/utils/util'
 
   export default {
-    name: 'ModRecTestForm',
+    name: 'ModRecResultForm',
     components: {
     },
     props: {
@@ -47,9 +67,9 @@
         validatorRules: {
         },
         url: {
-          add: "/dd/modRecTest/add",
-          edit: "/dd/modRecTest/edit",
-          queryById: "/dd/modRecTest/queryById"
+          add: "/rec/modRecResult/add",
+          edit: "/rec/modRecResult/edit",
+          queryById: "/rec/modRecResult/queryById"
         }
       }
     },

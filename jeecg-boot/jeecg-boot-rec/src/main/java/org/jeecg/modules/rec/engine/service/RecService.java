@@ -1,6 +1,8 @@
 package org.jeecg.modules.rec.engine.service;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.commons.lang.StringUtils;
@@ -20,6 +22,7 @@ import org.jeecg.modules.rec.entity.ModRecComparison;
 import org.jeecg.modules.rec.entity.ModRecModel;
 import org.jeecg.modules.rec.service.IModRecComparisonService;
 import org.jeecg.modules.rec.service.IModRecModelService;
+import org.jeecg.modules.rec.service.IModRecResultService;
 import org.jeecg.modules.rec.service.IModRecService;
 
 import java.io.Serializable;
@@ -33,19 +36,20 @@ import java.util.List;
  * @Date: 2022/2/15 16:17
  */
 public class RecService {
-    private String mainName;
-    private String sideName;
     private IModRecService modRecService;
-    private IModRecModelService modRecModelService;
-    private IModRecComparisonService modRecComparisonService;
+    private IModRecResultService modRecResultService;
     private FullChecker fullChecker;
+    public String mainName;
+    public String sideName;
+    public String recName;
 
-    public RecService(String mainName, String sideName) {
-        this.mainName = mainName;
-        this.sideName = sideName;
+    public RecService(String recName) {
+        this.recName = recName;
+        String[] split = recName.split("_");
+        this.mainName = split[0];
+        this.sideName = split[1];
         this.modRecService = SpringContextHolder.getBean(IModRecService.class);
-        this.modRecComparisonService = SpringContextHolder.getBean(IModRecComparisonService.class);
-        this.modRecModelService = SpringContextHolder.getBean(IModRecModelService.class);
+        this.modRecResultService = SpringContextHolder.getBean(IModRecResultService.class);
         this.fullChecker = SpringContextHolder.getBean(FullChecker.class);
     }
 
@@ -66,8 +70,8 @@ public class RecService {
      * 系统交易追踪对账
      */
     public CheckResult recTrade(ModRecComparison modRecComparison, RecParameter parameter) {
-        List<ModRecModel> mainList = this.searchBillList(mainName, null, modRecComparison.getTradeNo());
-        List<ModRecModel> sideList = this.searchBillList(sideName, null, modRecComparison.getTradeNo());
+        List<ModRecModel> mainList = this.searchBillList(null, modRecComparison.getTradeNo(), mainName);
+        List<ModRecModel> sideList = this.searchBillList(null, modRecComparison.getTradeNo(), sideName);
         List<CheckResult> result = fullChecker.check(repairData(mainName, mainList, true), repairData(sideName, sideList, false), parameter);
         return CollectionUtils.isNotEmpty(result) ? result.get(0) : null;
     }
@@ -89,26 +93,62 @@ public class RecService {
     }
 
     /**
-     * 获取业务库账单
+     * 查询账单
      *
      * @return
      */
-    public List<ModRecModel> searchBillList(String name, Date date, String tradeNo) {
-        if (date == null && StringUtils.isBlank(tradeNo)) return null;
-        try {
-            MybatisPlusSaasConfig.tableModRecModel.set("mod_rec_" + name);
-            LambdaQueryWrapper<ModRecModel> wrapper = Wrappers.lambdaQuery();
-            if (StringUtils.isNotBlank(tradeNo))
-                wrapper.eq(ModRecModel::getTradeNo, tradeNo);
-            if (date != null)
-                wrapper.apply("create_time BETWEEN {0} AND {1}",
-                        DateUtils.formatDate(date, "yyyy-MM-dd 00:00:00"), DateUtils.formatDate(date, "yyyy-MM-dd 23:59:59"));
-            return modRecModelService.list(wrapper);
-        } catch (Exception ex) {
-            throw new RecException("账单获取失败", ex);
-        } finally {
-            MybatisPlusSaasConfig.tableModRecModel.remove();
-        }
+    public List<ModRecModel> searchBillList(Date date, String tradeNo, String name) {
+        return modRecResultService.searchBillList(date, tradeNo, name);
+    }
+
+    /**
+     * 保存对账记录
+     *
+     * @return
+     */
+    public void saveRecResult(List<ModRecComparison> modRecComparisons) {
+        modRecResultService.saveRecResult(modRecComparisons, recName);
+    }
+
+    /**
+     * 保存对账记录
+     *
+     * @return
+     */
+    public void saveRecResult(ModRecComparison modRecComparison) {
+        modRecResultService.saveRecResult(modRecComparison, recName);
+    }
+
+    /**
+     * 对账记录移除
+     *
+     * @param id
+     */
+    public void removeById(Serializable id) {
+        modRecResultService.removeById(id, recName);
+    }
+
+    /**
+     * 查找对账记录
+     *
+     * @return
+     */
+    public List<ModRecComparison> searchRecResult(int status, int limit) {
+        return modRecResultService.searchRecResult(status, limit, recName);
+    }
+
+    /**
+     * 获取进度阶段时间
+     *
+     * @param name
+     * @return
+     */
+    public Date excDate(String name, RecExecType type) {
+        ModRec modRec = modRecService.getOne(Wrappers.<ModRec>lambdaQuery()
+                .eq(ModRec::getName, name)
+                .eq(ModRec::getType, type.toString()));
+        if (modRec == null || modRec.getContent() == null) return null;
+        return DateUtils.parseDateDef(modRec.getContent().getString("excDate"), "yyyy-MM-dd");
     }
 
     /**
@@ -133,86 +173,5 @@ public class RecService {
             });
         }
         return tradeDataRec;
-    }
-
-    /**
-     * 对账记录
-     *
-     * @return
-     */
-    public void saveRecResult(List<ModRecComparison> modRecComparisons) {
-        if (CollectionUtils.isEmpty(modRecComparisons)) return;
-        try {
-            MybatisPlusSaasConfig.tableModRecComparison.set("mod_rec_res_" + mainName + "_" + sideName);
-            modRecComparisonService.insertOrUpdateBatch(modRecComparisons);
-        } catch (Exception ex) {
-            throw new RecException("对账记录保存失败", ex);
-        } finally {
-            MybatisPlusSaasConfig.tableModRecComparison.remove();
-        }
-    }
-
-    /**
-     * 对账记录
-     *
-     * @return
-     */
-    public void saveRecResult(ModRecComparison modRecComparison) {
-        try {
-            MybatisPlusSaasConfig.tableModRecComparison.set("mod_rec_res_" + mainName + "_" + sideName);
-            modRecComparisonService.saveOrUpdate(modRecComparison);
-        } catch (Exception ex) {
-            throw new RecException("对账记录保存失败", ex);
-        } finally {
-            MybatisPlusSaasConfig.tableModRecComparison.remove();
-        }
-    }
-
-    /**
-     * 对账记录移除
-     *
-     * @param id
-     */
-    public void removeById(Serializable id) {
-        try {
-            MybatisPlusSaasConfig.tableModRecComparison.set("mod_rec_res_" + mainName + "_" + sideName);
-            modRecComparisonService.removeById(id);
-        } catch (Exception ex) {
-            throw new RecException("对账记录删除失败", ex);
-        } finally {
-            MybatisPlusSaasConfig.tableModRecComparison.remove();
-        }
-    }
-
-    /**
-     * 查找对账记录
-     *
-     * @return
-     */
-    public List<ModRecComparison> searchRecResult(int status, int limit) {
-        try {
-            MybatisPlusSaasConfig.tableModRecComparison.set("mod_rec_res_" + mainName + "_" + sideName);
-            return modRecComparisonService.list(Wrappers.<ModRecComparison>lambdaQuery()
-                    .eq(ModRecComparison::getStatus, status).orderByAsc(ModRecComparison::getCreateTime)
-                    .last("limit " + limit));
-        } catch (Exception ex) {
-            throw ex;
-        } finally {
-            MybatisPlusSaasConfig.tableModRecComparison.remove();
-        }
-    }
-
-    /**
-     * 获取进度阶段时间
-     *
-     * @param name
-     * @return
-     */
-    public Date excDate(String name, RecExecType type) {
-        ModRec modRec = modRecService.getOne(Wrappers.<ModRec>lambdaQuery()
-                .eq(ModRec::getName, name)
-                .eq(ModRec::getType, type.toString()));
-        if (modRec == null || modRec.getContent() == null) return null;
-        return DateUtils.parseDateDef(modRec.getContent().getString("excDate"), "yyyy-MM-dd");
     }
 }
