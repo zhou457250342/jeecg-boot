@@ -15,12 +15,12 @@
           </a-col>
           <a-col :span="24">
             <a-form-model-item label="主系统金额" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="mainAmount">
-              <a-input-number v-model="model.mainAmount" placeholder="请输入主系统金额" style="width: 100%" />
+              <a-input-number v-model="model.amountMain" placeholder="请输入主系统金额" style="width: 100%" />
             </a-form-model-item>
           </a-col>
           <a-col :span="24">
             <a-form-model-item label="支付系统金额" :labelCol="labelCol" :wrapperCol="wrapperCol" prop="sideAmount">
-              <a-input-number v-model="model.sideAmount" placeholder="请输入支付系统金额" style="width: 100%" />
+              <a-input-number v-model="model.amountSide" placeholder="请输入支付系统金额" style="width: 100%" />
             </a-form-model-item>
           </a-col>
           <a-col :span="24">

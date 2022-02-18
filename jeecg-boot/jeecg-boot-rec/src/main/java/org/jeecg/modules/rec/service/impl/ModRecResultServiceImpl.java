@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang.StringUtils;
 import org.jeecg.common.util.DateUtils;
 import org.jeecg.config.mybatis.MybatisPlusSaasConfig;
+import org.jeecg.modules.rec.engine.checker.CheckResult;
 import org.jeecg.modules.rec.engine.model.RecException;
 import org.jeecg.modules.rec.engine.service.RecService;
 import org.jeecg.modules.rec.entity.ModRecComparison;
@@ -59,11 +60,20 @@ public class ModRecResultServiceImpl implements IModRecResultService {
             view.setCreateTime(op.getCreateTime());
             view.setTradeNo(op.getTradeNo());
             view.setOrderNo(op.getOrderNo());
-            view.setStatus(op.getStatus());
+            view.setStatus(op.getStatus() == 1 ? "失败" : "成功");
+            CheckResult checkResult = op.getResult();
+            if (checkResult != null) {
+                view.setAmountMain(checkResult.getAmountMain());
+                view.setAmountSide(checkResult.getAmountSide());
+            }
             viewList.add(view);
         });
         page.setRecords(viewList);
         return page;
+    }
+
+    public ModRecComparison getById(String id, String t_name) {
+        return this.modRecComparisonSup(() -> this.modRecComparisonService.getById(id), t_name);
     }
 
     public List<ModRecComparison> searchRecResult(int status, int limit, String t_name) {

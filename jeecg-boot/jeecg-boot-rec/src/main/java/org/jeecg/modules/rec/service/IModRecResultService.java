@@ -29,6 +29,14 @@ public interface IModRecResultService {
     IPage<ModRecResultView> page(Page page, ModRecResultView modRecResult, String t_name);
 
     /**
+     * 获取对账结果
+     *
+     * @param id
+     * @return
+     */
+    ModRecComparison getById(String id, String t_name);
+
+    /**
      * @param page
      * @param queryWrapper
      * @return

@@ -48,19 +48,19 @@ public class ModRecResultView implements Serializable {
      */
     @Excel(name = "主系统金额", width = 15)
     @ApiModelProperty(value = "主系统金额")
-    private java.math.BigDecimal mainAmount;
+    private float amountMain;
     /**
      * 支付系统金额
      */
     @Excel(name = "支付系统金额", width = 15)
     @ApiModelProperty(value = "支付系统金额")
-    private java.math.BigDecimal sideAmount;
+    private float amountSide;
     /**
      * 对账结果
      */
     @Excel(name = "对账结果", width = 15)
     @ApiModelProperty(value = "对账结果")
-    private java.lang.Integer status;
+    private java.lang.String status;
     /**
      * 处理时间
      */

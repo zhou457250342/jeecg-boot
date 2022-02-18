@@ -3,6 +3,7 @@ package org.jeecg.modules.rec.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.modules.rec.entity.ModRecComparison;
 import org.jeecg.modules.rec.entity.view.ModRecResultView;
 import org.jeecg.modules.rec.service.IModRecResultService;
 
@@ -119,11 +120,7 @@ public class ModRecResultController {
     @ApiOperation(value = "mod_rec_result-通过id查询", notes = "mod_rec_result-通过id查询")
     @GetMapping(value = "/queryById")
     public Result<?> queryById(@RequestParam(name = "id", required = true) String id) {
-//        ModRecResult modRecResult = modRecResultService.getById(id);
-//        if (modRecResult == null) {
-//            return Result.error("未找到对应数据");
-//        }
-//        return Result.OK(modRecResult);
-        return null;
+        ModRecComparison modRecResult = modRecResultService.getById(id, fn_name);
+        return Result.OK(modRecResult);
     }
 }

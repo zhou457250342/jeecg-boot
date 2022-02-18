@@ -1,14 +1,18 @@
 package org.jeecg.modules.rec.entity;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.jeecg.modules.rec.engine.checker.CheckResult;
 import org.jeecgframework.poi.excel.annotation.Excel;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -65,4 +69,12 @@ public class ModRecComparison implements Serializable {
     @Excel(name = "result", width = 15)
     @ApiModelProperty(value = "result")
     private String result;
+
+    public CheckResult getResult() {
+        try {
+            return JSONObject.parseObject(result, CheckResult.class);
+        } catch (Exception ex) {
+            return null;
+        }
+    }
 }
