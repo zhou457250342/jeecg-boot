@@ -1,0 +1,44 @@
+{
+  "note": "迈瑞IPM7、GE",
+  "isDebug": true,
+  "cts": [
+    {
+      "id": "M-1",
+      "type": "client",
+      "macId": "MR-1",
+      "ip": "127.0.0.1",
+      "port": "8101",
+      "handler": "MR_IPM7_Monitor",
+      "status": 1,
+      "note": ""
+    },
+    {
+      "id": "M-2",
+      "type": "server",
+      "macId": "GE-2|GE-3",
+      "ip": "127.0.0.1",
+      "port": "8113",
+      "handler": "GE_Monitor",
+      "status": 1,
+      "note": ""
+    }
+  ],
+  "mac": [
+    {
+      "id": "MR-001",
+      "name": "迈瑞-IPM7",
+      "bussNo": "抢1",
+      "ip": "127.0.0.1",
+      "port": "8881",
+      "note": ""
+    },
+    {
+      "id": "GE-002",
+      "name": "GE-B650",
+      "bussNo": "抢3",
+      "ip": "127.0.0.1",
+      "port": "",
+      "note": ""
+    }
+  ]
+}
