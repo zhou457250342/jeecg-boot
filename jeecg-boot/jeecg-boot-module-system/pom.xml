@@ -76,6 +76,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.jeecgframework.boot</groupId>
+			<artifactId>jeecg-boot-consultation</artifactId>
+			<version>3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jeecgframework.boot</groupId>
 			<artifactId>jeecg-boot-context</artifactId>
 			<version>3.0</version>
 		</dependency>

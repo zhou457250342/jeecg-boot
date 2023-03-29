@@ -59,6 +59,7 @@
         <module>jeecg-boot-rec</module>
 		<module>jeecg-boot-context</module>
         <module>jeecg-boot-monitor</module>
+        <module>jeecg-boot-consultation</module>
         <!--需要微服务，请打开
         <module>jeecg-boot-starter</module>
         <module>jeecg-cloud-module</module>-->
